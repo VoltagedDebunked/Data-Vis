@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Vis - Complex Scatter Plot Visualization</title>
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/pX3j8gq9/Levi-1-removebg-preview.png">
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Ubuntu', sans-serif;
+      background-color: #1f1f1f;
+      color: #ffffff;
+      padding: 20px;
+    }
+    h1 {
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    h2 {
+      color: #ffffff;
+      text-align: center;
+      margin-top: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .graph-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .graph {
+      width: 100%;
+      height: 300px;
+    }
+    .input-container {
+      margin-top: 20px;
+    }
+    .input-container label {
+      color: #ffffff;
+      font-weight: bold;
+    }
+    .form-control {
+      background-color: #303030;
+      border: 1px solid #ffffff;
+      color: #ffffff;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #343a40;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+    }
+    .logo {
+      width: 30px;
+      height: auto;
+      margin-right: 10px;
+    }
+    .header h1 {
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: bold;
+      margin: 0;
+    }
+    .data-vis {
+      margin-right: auto;
+    }
+    .support {
+      display: flex;
+      align-items: center;
+    }
+    .support-text {
+      margin-right: 10px;
+    }
+    .spacingtext {
+      border-spacing:  4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><span class="data-vis">Data Vis</span></h1> 
+      <a id="source-code-link" href="https://github.com/VoltagedDebunked/Data-Vis" target="_blank">
+        <img src="github.ico" alt="Source Code" width="30px">
+          View Source Code
+      <div class="support">
+        <span class="support-text">Support me</span>
+        <a href="https://i.postimg.cc/5tJVdDVK/image-removebg-preview-8.png" target="_blank"><img src="kofi.png" alt="Coffee Cup" width="30" height="30"></a>
+      </div>
+    </div>
+    <h2>The best tool for making graphs.</h2>
+    <div id="visualization" class="graph"></div>
+
+    <div class="input-container">
+      <label for="dataPoint">Enter Data Point (x,y):</label>
+      <input type="text" id="dataPoint" class="form-control" placeholder="e.g., 10,20">
+      <button id="addDataButton" class="btn btn-primary mt-2">Add Data Point</button>
+    </div>
+
+    <div class="graph-container">
+      <div id="barChart" class="graph"></div>
+      <div id="lineChart" class="graph"></div>
+    </div>
+
+    <div class="input-container">
+      <label for="barValues">Bar Chart Values:</label>
+      <input type="text" id="barValues" class="form-control" placeholder="Enter comma-separated values">
+    </div>
+    <div class="input-container">
+      <label for="lineValues">Line Chart Values:</label>
+      <input type="text" id="lineValues" class="form-control" placeholder="Enter comma-separated values">
+    </div>
+
+    <div class="input-container">
+      <label for="barLabels">Bar Chart Labels:</label>
+      <input type="text" id="barLabels" class="form-control" placeholder="Enter comma-separated labels">
+    </div>
+    <div class="input-container">
+      <label for="lineLabels">Line Chart Labels:</label>
+      <input type="text" id="lineLabels" class="form-control" placeholder="Enter comma-separated labels">
+    </div>
+  </div>
+
+  <script>
+    let inputData = [
+      { "x": 0, "y": 0 },
+      { "x": 0, "y": 0 },
+      { "x": 0, "y": 0 },
+      // More data points...
+    ];
+
+    const trace = {
+      x: inputData.map(d => d.x),
+      y: inputData.map(d => d.y),
+      mode: 'markers',
+      type: 'scatter',
+      marker: { color: '#3F51B5' }
+    };
+    const layout = {
+      title: {
+        text: 'Scatter Plot',
+        font: {
+          color: '#ffffff'
+        }
+      },
+      xaxis: { title: 'X Axis', color: '#ffffff' },
+      yaxis: { title: 'Y Axis', color: '#ffffff' },
+      plot_bgcolor: '#303030',
+      paper_bgcolor: '#303030',
+    };
+    Plotly.newPlot('visualization', [trace], layout);
+
+    const config = { responsive: true };
+    Plotly.newPlot('visualization', [trace], layout, config);
+
+    document.getElementById('addDataButton').addEventListener('click', () => {
+      const dataPoint = document.getElementById('dataPoint').value.trim();
+      const [x, y] = dataPoint.split(',').map(Number);
+      inputData.push({ x, y });
+      Plotly.extendTraces('visualization', { x: [[x]], y: [[y]] }, [0]);
+    });
+
+    const barChartTrace = {
+      x: ['A', 'B', 'C', 'D'],
+      y: [10, 20, 30, 40],
+      type: 'bar'
+    };
+    const barChartLayout = {
+      title: {
+        text: 'Bar Chart',
+        font: {
+          color: '#ffffff'
+        }
+      },
+      plot_bgcolor: '#303030',
+      paper_bgcolor: '#303030',
+      font: {
+        color: '#ffffff'
+      }
+    };
+    Plotly.newPlot('barChart', [barChartTrace], barChartLayout);
+
+    const lineChartTrace = {
+      x: ['A', 'B', 'C', 'D'],
+      y: [30, 20, 10, 40],
+      type: 'line'
+    };
+    const lineChartLayout = {
+      title: {
+        text: 'Line Chart',
+        font: {
+          color: '#ffffff'
+        }
+      },
+      plot_bgcolor: '#303030',
+      paper_bgcolor: '#303030',
+      font: {
+        color: '#ffffff'
+      }
+    };
+    Plotly.newPlot('lineChart', [lineChartTrace], lineChartLayout);
+
+    document.getElementById('barValues').addEventListener('change', (event) => {
+      const values = event.target.value.split(',').map(Number);
+      barChartTrace.y = values;
+      Plotly.react('barChart', [barChartTrace], barChartLayout);
+    });
+
+    document.getElementById('lineValues').addEventListener('change', (event) => {
+      const values = event.target.value.split(',').map(Number);
+      lineChartTrace.y = values;
+      Plotly.react('lineChart', [lineChartTrace], lineChartLayout);
+    });
+
+    document.getElementById('barLabels').addEventListener('change', (event) => {
+      const labels = event.target.value.split(',');
+      barChartTrace.x = labels;
+      Plotly.react('barChart', [barChartTrace], barChartLayout);
+    });
+
+    document.getElementById('lineLabels').addEventListener('change', (event) => {
+      const labels = event.target.value.split(',');
+      lineChartTrace.x = labels;
+      Plotly.react('lineChart', [lineChartTrace], lineChartLayout);
+    });
+
+  </script>
+</body>
+</html>
